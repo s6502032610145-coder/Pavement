@@ -36,10 +36,21 @@ if road_type == "Flexible Pavement":
     # SN Required Calculation
     # -----------------------
     ZR = -1.282  # approx for 90%
-    SN_req = (
-        (np.log10(W18) - ZR*So + 2.32*np.log10(Mr) - 8.07)
-        /
-        (0.4 + (1094/(SN_req if 'SN_req' in locals() else 5.0)**5.19))
+    def calc_SN_required(W18, Mr, So, ZR, deltaPSI):
+    SN = 3.0
+    for _ in range(20):
+        term1 = ZR * So
+        term2 = 9.36 * np.log10(SN + 1)
+        term3 = (np.log10(deltaPSI/(4.2-1.5))) / (0.40 + (1094/(SN+1)**5.19))
+        term4 = 2.32 * np.log10(Mr) - 8.07
+
+        SN = 10 ** ((np.log10(W18) + term1 - term2 - term3 - term4)/9.36)
+
+    return SN
+
+ZR = -1.036  # สำหรับ Reliability 85%
+
+SN_req = calc_SN_required(W18, Mr, So, ZR, deltaPSI)
     ) if W18>0 else 0
 
     # -----------------------
