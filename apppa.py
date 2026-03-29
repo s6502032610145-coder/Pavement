@@ -4,9 +4,7 @@ import matplotlib.pyplot as plt
 
 st.set_page_config(layout="wide")
 
-# -----------------------------
-# STYLE
-# -----------------------------
+# ---------------- STYLE ----------------
 st.markdown("""
 <style>
 .metric{
@@ -24,9 +22,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# -----------------------------
-# AASHTO FLEXIBLE FUNCTION
-# -----------------------------
+# ---------------- AASHTO FUNCTION ----------------
 def calc_SN_required(W18, Mr, So, ZR, deltaPSI):
     SN = 3.0
     for _ in range(20):
@@ -37,15 +33,12 @@ def calc_SN_required(W18, Mr, So, ZR, deltaPSI):
         SN = 10 ** ((np.log10(W18) + term1 - term2 - term3 - term4)/9.36)
     return SN
 
-# -----------------------------
-# SIDEBAR
-# -----------------------------
+# ---------------- SIDEBAR ----------------
 st.sidebar.title("🚧 AASHTO 1993")
 
 road = st.sidebar.radio(
     "เลือกประเภทผิวทาง",
-    ["Flexible Pavement", "Rigid Pavement"],
-    key="road_type"
+    ["Flexible Pavement", "Rigid Pavement"]
 )
 
 W18 = st.sidebar.number_input("W18 (ESAL)", value=10000000.0)
@@ -63,7 +56,7 @@ ZR_table = {
 ZR = ZR_table.get(R,-1.036)
 
 # ======================================================
-# FLEXIBLE PAVEMENT
+# FLEXIBLE
 # ======================================================
 if road == "Flexible Pavement":
 
@@ -71,29 +64,51 @@ if road == "Flexible Pavement":
 
     SN_req = calc_SN_required(W18, Mr, So, ZR, deltaPSI)
 
-    c1,c2,c3 = st.columns(3)
+    st.subheader("Layer Properties")
+
+    c1,c2,c3,c4,c5 = st.columns(5)
 
     with c1:
-        d1 = st.number_input("D1 Asphalt (cm)", value=5.0)
+        a1 = st.number_input("a1", value=0.40)
+        m1 = st.number_input("m1", value=1.0)
+        d1 = st.number_input("D1 AC (cm)", value=5.0)
 
     with c2:
+        a2 = st.number_input("a2", value=0.18)
+        m2 = st.number_input("m2", value=1.1)
         d2 = st.number_input("D2 Base (cm)", value=20.0)
 
     with c3:
+        a3 = st.number_input("a3", value=0.13)
+        m3 = st.number_input("m3", value=1.1)
         d3 = st.number_input("D3 Subbase (cm)", value=25.0)
 
-    SN = 0.40*(d1/2.54) + 0.18*(d2/2.54) + 0.13*(d3/2.54)
+    with c4:
+        a4 = st.number_input("a4", value=0.0)
+        m4 = st.number_input("m4", value=1.0)
+        d4 = st.number_input("D4 (cm)", value=0.0)
 
-    total = d1 + d2 + d3
+    with c5:
+        a5 = st.number_input("a5", value=0.0)
+        m5 = st.number_input("m5", value=1.0)
+        d5 = st.number_input("D5 (cm)", value=0.0)
+
+    SN1 = a1*m1*(d1/2.54)
+    SN2 = SN1 + a2*m2*(d2/2.54)
+    SN3 = SN2 + a3*m3*(d3/2.54)
+    SN4 = SN3 + a4*m4*(d4/2.54)
+    SN5 = SN4 + a5*m5*(d5/2.54)
+
+    total = d1+d2+d3+d4+d5
 
     col1,col2,col3,col4 = st.columns(4)
 
     col1.markdown(f'<div class="metric m1">SN Required<br>{SN_req:.3f}</div>',unsafe_allow_html=True)
-    col2.markdown(f'<div class="metric m2">SN Provided<br>{SN:.3f}</div>',unsafe_allow_html=True)
+    col2.markdown(f'<div class="metric m2">SN Provided<br>{SN5:.3f}</div>',unsafe_allow_html=True)
     col3.markdown(f'<div class="metric m3">Total Thickness<br>{total:.1f} cm</div>',unsafe_allow_html=True)
     col4.markdown(f'<div class="metric m4">W18<br>{W18:,.0f}</div>',unsafe_allow_html=True)
 
-    if SN >= SN_req:
+    if SN5 >= SN_req:
         st.success("ผ่าน")
     else:
         st.error("ไม่ผ่าน")
@@ -103,50 +118,52 @@ if road == "Flexible Pavement":
 
     fig, ax = plt.subplots(figsize=(3,6))
 
-    layers=[d1,d2,d3]
-    names=["Asphalt","Base","Subbase"]
-    colors=["#333333","#999999","#87CEEB"]
+    layers=[d1,d2,d3,d4,d5]
+    names=["AC","Base","Subbase","Layer4","Layer5"]
+    colors=["#333333","#999999","#87CEEB","#f4a261","#2a9d8f"]
 
     bottom=0
     for i in range(len(layers)):
-        ax.bar(0,layers[i],bottom=bottom,color=colors[i])
-        ax.text(0,bottom+layers[i]/2,
-                f"{names[i]}\n{layers[i]} cm",
-                ha="center",va="center",
-                color="white" if i==0 else "black")
-        bottom+=layers[i]
+        if layers[i] > 0:
+            ax.bar(0,layers[i],bottom=bottom,color=colors[i])
+            ax.text(0,bottom+layers[i]/2,
+                    f"{names[i]}\n{layers[i]} cm",
+                    ha="center",va="center",
+                    color="white" if i==0 else "black")
+            bottom+=layers[i]
 
     ax.set_xticks([])
     ax.set_xlim(-1,1)
     st.pyplot(fig)
 
 # ======================================================
-# RIGID PAVEMENT
+# RIGID
 # ======================================================
 if road == "Rigid Pavement":
 
     st.title("Rigid Pavement — AASHTO 1993")
 
+    st.subheader("Layer Properties")
+
     c1,c2,c3 = st.columns(3)
 
     with c1:
-        D = st.number_input("D Concrete Slab (cm)", value=25.0)
+        D = st.number_input("D1 Concrete Slab (cm)", value=25.0)
 
     with c2:
-        Db = st.number_input("D Base (cm)", value=10.0)
+        Db = st.number_input("D2 Base (cm)", value=10.0)
 
     with c3:
-        Ds = st.number_input("D Subbase (cm)", value=15.0)
+        Ds = st.number_input("D3 Subbase (cm)", value=15.0)
 
-    # simplified rigid
     D_req = (np.log10(W18)+1)*5
 
     total = D + Db + Ds
 
     col1,col2,col3,col4 = st.columns(4)
 
-    col1.markdown(f'<div class="metric m1">Required<br>{D_req:.1f} cm</div>',unsafe_allow_html=True)
-    col2.markdown(f'<div class="metric m2">Provided<br>{D:.1f} cm</div>',unsafe_allow_html=True)
+    col1.markdown(f'<div class="metric m1">Required<br>{D_req:.1f}</div>',unsafe_allow_html=True)
+    col2.markdown(f'<div class="metric m2">Provided<br>{D:.1f}</div>',unsafe_allow_html=True)
     col3.markdown(f'<div class="metric m3">Total Thickness<br>{total:.1f} cm</div>',unsafe_allow_html=True)
     col4.markdown(f'<div class="metric m4">W18<br>{W18:,.0f}</div>',unsafe_allow_html=True)
 
