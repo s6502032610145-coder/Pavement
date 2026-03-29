@@ -34,7 +34,6 @@ def calc_SN_required(W18, Mr, So, ZR, deltaPSI):
         term2 = 9.36 * np.log10(SN + 1)
         term3 = (np.log10(deltaPSI/(4.2-1.5))) / (0.40 + (1094/(SN+1)**5.19))
         term4 = 2.32 * np.log10(Mr) - 8.07
-
         SN = 10 ** ((np.log10(W18) + term1 - term2 - term3 - term4)/9.36)
     return SN
 
@@ -115,8 +114,6 @@ if road == "Flexible Pavement":
     col3.markdown(f'<div class="metric-box bg3">Total Thickness<br>{total:.1f} cm</div>',unsafe_allow_html=True)
     col4.markdown(f'<div class="metric-box bg4">W18<br>{W18:,.0f}</div>',unsafe_allow_html=True)
 
-    st.write("")
-
     if SN5 >= SN_req:
         st.success("ผ่าน")
     else:
@@ -130,17 +127,16 @@ if road == "Flexible Pavement":
         "SN":[SN1,SN2,SN3,SN4,SN5]
     })
 
-    # ------------------------
-    # CROSS SECTION
-    # ------------------------
+    # CROSS SECTION (แก้เรียง)
     st.subheader("Cross Section")
 
     fig, ax = plt.subplots(figsize=(3,6))
 
     layers = [d5,d4,d3,d2,d1]
-labels = ["D5","D4","D3","D2","D1"]
-names  = ["Layer5","Layer4","Subbase","Base","AC"]
-colors = ["#2a9d8f","#f4a261","#87CEEB","#8c8c8c","#333333"]
+    labels = ["D5","D4","D3","D2","D1"]
+    names  = ["Layer5","Layer4","Subbase","Base","AC"]
+    colors = ["#2a9d8f","#f4a261","#87CEEB","#8c8c8c","#333333"]
+
     bottom = 0
 
     for i in range(len(layers)):
@@ -152,8 +148,7 @@ colors = ["#2a9d8f","#f4a261","#87CEEB","#8c8c8c","#333333"]
                 f"{names[i]}\n{labels[i]} = {layers[i]:.1f} cm",
                 ha='center',
                 va='center',
-                color='white' if i==0 else 'black',
-                fontsize=9
+                color='white' if i==4 else 'black'
             )
             bottom += layers[i]
 
@@ -164,9 +159,6 @@ colors = ["#2a9d8f","#f4a261","#87CEEB","#8c8c8c","#333333"]
 
     st.pyplot(fig)
 
-# ------------------------
-# RIGID
-# ------------------------
 # ------------------------
 # RIGID
 # ------------------------
@@ -210,7 +202,6 @@ if road == "Rigid Pavement":
     SN5=SN4+a5*m5*(d5/2.54)
 
     total = d1+d2+d3+d4+d5
-
     SN_req = (np.log10(W18)+1)*3
 
     col1,col2,col3,col4 = st.columns(4)
@@ -233,14 +224,15 @@ if road == "Rigid Pavement":
         "SN":[SN1,SN2,SN3,SN4,SN5]
     })
 
+    # CROSS SECTION (แก้เรียง)
     st.subheader("Cross Section")
 
     fig, ax = plt.subplots(figsize=(3,6))
 
-   layers = [d5,d4,d3,d2,d1]
-labels = ["D5","D4","D3","D2","D1"]
-names  = ["Layer5","Layer4","Subbase","Base","Concrete"]
-colors = ["#2a9d8f","#f4a261","#87CEEB","#bbbbbb","#dddddd"]
+    layers = [d5,d4,d3,d2,d1]
+    labels = ["D5","D4","D3","D2","D1"]
+    names  = ["Layer5","Layer4","Subbase","Base","Concrete"]
+    colors = ["#2a9d8f","#f4a261","#87CEEB","#bbbbbb","#dddddd"]
 
     bottom = 0
 
