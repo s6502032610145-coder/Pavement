@@ -137,11 +137,10 @@ if road == "Flexible Pavement":
 
     fig, ax = plt.subplots(figsize=(3,6))
 
-    layers = [d1,d2,d3,d4,d5]
-    labels = ["D1","D2","D3","D4","D5"]
-    names  = ["AC","Base","Subbase","Layer4","Layer5"]
-    colors = ["#333333","#8c8c8c","#87CEEB","#f4a261","#2a9d8f"]
-
+    layers = [d5,d4,d3,d2,d1]
+labels = ["D5","D4","D3","D2","D1"]
+names  = ["Layer5","Layer4","Subbase","Base","AC"]
+colors = ["#2a9d8f","#f4a261","#87CEEB","#8c8c8c","#333333"]
     bottom = 0
 
     for i in range(len(layers)):
@@ -238,10 +237,10 @@ if road == "Rigid Pavement":
 
     fig, ax = plt.subplots(figsize=(3,6))
 
-    layers = [d1,d2,d3,d4,d5]
-    labels = ["D1","D2","D3","D4","D5"]
-    names  = ["Concrete","Base","Subbase","Layer4","Layer5"]
-    colors = ["#dddddd","#bbbbbb","#87CEEB","#f4a261","#2a9d8f"]
+   layers = [d5,d4,d3,d2,d1]
+labels = ["D5","D4","D3","D2","D1"]
+names  = ["Layer5","Layer4","Subbase","Base","Concrete"]
+colors = ["#2a9d8f","#f4a261","#87CEEB","#bbbbbb","#dddddd"]
 
     bottom = 0
 
